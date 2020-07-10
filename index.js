@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const { exec } = require("child_process");
 const prependFile = require('prepend-file');
 const tty = require('tty');
