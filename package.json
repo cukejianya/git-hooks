@@ -1,0 +1,15 @@
+{
+  "name": "git-hooks",
+  "version": "1.0.0",
+  "description": "a git hooks example proj",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cli-color": "^2.0.0",
+    "inquirer": "^7.3.1"
+  }
+}
