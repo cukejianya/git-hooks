@@ -60,14 +60,14 @@ prompt(questions).then( answers => {
   exec('git symbolic-ref --short HEAD', (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
-      return;
+      process.exit(1);
     }
     if (stderr) {
       console.log(`stderr: ${stderr}`);
-      return;
+      process.exit(1);
     }
-    var prefix = `${getTicketNumber(stdout)} ${answers.type}`;
-    prefix += (answers.scope) ? `(${answers.scope}): ` : ": ";
+    var scope = (answers.scope) ? `(${answers.scope})` : "";
+    var prefix = `${answers.type + scope}: ${getTicketNumber(stdout)} - `;
     prependFile(commit_msg_filepath, prefix, (err) => {
       if (err) {
         process.exit(1);
