@@ -4,7 +4,10 @@ const { exec } = require("child_process");
 const prependFile = require('prepend-file');
 const tty = require('tty');
 const fs = require('fs');
-var inquirer = require('inquirer');
+const inquirer = require('inquirer');
+const fuzzy = require('fuzzy');
+
+inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 if (!process.stdin.isTTY) {
   const { O_RDONLY, O_NOCTTY } = fs.constants;
@@ -26,11 +29,14 @@ if (!process.stdin.isTTY) {
 }
 
 let commitType = {
-  type: 'list',
+  type: 'autocomplete',
   name: 'type',
   message: 'What type of commit is this?',
-  default: 0,
-  choices: [
+  source: (...args) => searchTypes(...args),
+}
+
+function searchTypes(answers, input = '') {
+  let choices = [
     'feat',
     'fix',
     'refactor',
@@ -40,7 +46,11 @@ let commitType = {
     'perf',
     'ci',
     'docs',
-  ]
+  ];
+  return new Promise(function(resolve) {
+    let res = fuzzy.filter(input, choices);
+    resolve(res.map(el => el.string));
+  });
 }
 
 let commitScope = {
@@ -54,9 +64,8 @@ let questions = [
 ]
 
 var commit_msg_filepath = process.argv[2];
-var prompt = inquirer.createPromptModule();
 
-prompt(questions).then( answers => {
+inquirer.prompt(questions).then( answers => {
   exec('git symbolic-ref --short HEAD', (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`);
