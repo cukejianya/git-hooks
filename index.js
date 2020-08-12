@@ -116,7 +116,7 @@ inquirer.prompt(questions).then( answers => {
     }
     var scope = (answers.scope) ? `(${answers.scope})` : '';
     var ticket = isValidTicket(stdout) ? `${getTicketNumber(stdout)} - ` : '';
-    var prefix = `${answers.type + scope}: ${ticket} - `;
+    var prefix = `${answers.type + scope}: ${ticket}`;
     prependFile(commit_msg_filepath, prefix, (err) => {
       if (err) {
         process.exit(1);
