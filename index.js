@@ -54,8 +54,47 @@ function searchTypes(answers, input = '') {
 }
 
 let commitScope = {
+  type: 'autocomplete',
   name: 'scope',
-  message: '(optional) What is the scope of this commit?'
+  message: '(optional) What is the scope of this commit?',
+  source: (...args) => searchScopes(...args),
+  suggestOnly: true,
+}
+
+async function searchScopes(answers, input = '') {
+  let choices = await getPreviousScopes();
+  
+  return new Promise(function(resolve) {
+    let res = fuzzy.filter(input, choices);
+    resolve(res.map(el => el.string));
+  });
+}
+
+function getPreviousScopes() {
+  let cmd =`git log --pretty=format:%s -E --grep="^\\w+\\(.+\\)" --no-merges --all -1000`
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+        process.exit(1);
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        process.exit(1);
+      }
+      let scopes = [...new Set(stdout.split('\n').map( msg => getScope(msg) ))];
+      resolve(scopes.filter(elm => !!elm));
+    });
+  });
+}
+
+function getScope(message) {
+  const regex = /^\w+\((.+)\):/;
+  if (!regex.test(message)) {
+    return '';
+  }
+
+  return message.match(regex)[1];
 }
 
 let questions = [
