@@ -114,8 +114,9 @@ inquirer.prompt(questions).then( answers => {
       console.log(`stderr: ${stderr}`);
       process.exit(1);
     }
-    var scope = (answers.scope) ? `(${answers.scope})` : "";
-    var prefix = `${answers.type + scope}: ${getTicketNumber(stdout)} - `;
+    var scope = (answers.scope) ? `(${answers.scope})` : '';
+    var ticket = isValidTicket(stdout) ? `${getTicketNumber(stdout)} - ` : '';
+    var prefix = `${answers.type + scope}: ${ticket} - `;
     prependFile(commit_msg_filepath, prefix, (err) => {
       if (err) {
         process.exit(1);
@@ -124,6 +125,11 @@ inquirer.prompt(questions).then( answers => {
     });
   });
 })
+
+function isValidTicket(branch) {
+  const regex = /TECHCO-\d+/g;
+  return regex.test(branch);
+}
 
 function getTicketNumber(branch) {
   const regex = /TECHCO-\d+/g;
