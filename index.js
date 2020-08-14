@@ -7,6 +7,8 @@ const fs = require('fs');
 const inquirer = require('inquirer');
 const fuzzy = require('fuzzy');
 
+let commit_msg_filepath = process.argv[2];
+
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 if (!process.stdin.isTTY) {
@@ -102,7 +104,6 @@ let questions = [
   commitScope,
 ]
 
-var commit_msg_filepath = process.argv[2];
 
 inquirer.prompt(questions).then( answers => {
   exec('git symbolic-ref --short HEAD', (error, stdout, stderr) => {
