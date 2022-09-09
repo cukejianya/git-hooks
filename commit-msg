@@ -39,6 +39,7 @@ let commitType = {
 
 function searchTypes(answers, input = '') {
   let choices = [
+    'none',
     'feat',
     'fix',
     'refactor',
@@ -99,41 +100,66 @@ function getScope(message) {
   return message.match(regex)[1];
 }
 
-let questions = [
-  commitType,
-  commitScope,
-]
+let ticketNumber = {
+  type: 'number',
+  name: 'ticket',
+  message: 'What is the ticket number?',
+  default: getDefaultTicket,
+}
 
+var ticketName = '';
 
-inquirer.prompt(questions).then( answers => {
-  exec('git symbolic-ref --short HEAD', (error, stdout, stderr) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-      process.exit(1);
-    }
-    if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      process.exit(1);
-    }
-    var scope = (answers.scope) ? `(${answers.scope})` : '';
-    var ticket = isValidTicket(stdout) ? `${getTicketNumber(stdout)} - ` : '';
-    var prefix = `${answers.type + scope}: ${ticket}`;
-    prependFile(commit_msg_filepath, prefix, (err) => {
-      if (err) {
+function getDefaultTicket() {
+  let cmd = 'git symbolic-ref --short HEAD';
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
         process.exit(1);
       }
-      process.exit(0);
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        process.exit(1);
+      }
+      let ticketNumber = '';
+      if (isBranchTicketValid(stdout)) {
+        let ticketRegexArray =  getBranchTicket(stdout);
+        ticketName  = ticketRegexArray[1];
+        ticketNumber =  ticketRegexArray[2];
+      }
+      resolve(parseInt(ticketNumber));
     });
   });
-})
+}
 
-function isValidTicket(branch) {
-  const regex = /TECHCO-\d+/g;
+function isBranchTicketValid(branch) {
+  const regex = /^\w+\/(\w+)-\d+/g;
   return regex.test(branch);
 }
 
-function getTicketNumber(branch) {
-  const regex = /TECHCO-\d+/g;
+function getBranchTicket(branch) {
+  const regex = /^\w+\/(\w+)-(\d+)/;
   return branch.match(regex);
 }
+
+let questions = [
+  commitType,
+  commitScope,
+  ticketNumber,
+];
+
+inquirer.prompt(questions).then( answers => {
+  if (answers.type === 'none') {
+    process.exit(0);
+  }
+  var scope = (answers.scope) ? `(${answers.scope})` : '';
+  var ticket = ticketName && answers.ticket ? `${ticketName}-${answers.ticket} - ` : '';
+  var prefix = `${answers.type + scope}: ${ticket}`;
+  prependFile(commit_msg_filepath, prefix, (err) => {
+    if (err) {
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+});
 
