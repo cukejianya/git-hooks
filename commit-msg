@@ -62,6 +62,7 @@ let commitScope = {
   message: '(optional) What is the scope of this commit?',
   source: (...args) => searchScopes(...args),
   suggestOnly: true,
+  when: (answers) => answers.type !== 'none',
 }
 
 async function searchScopes(answers, input = '') {
@@ -105,6 +106,7 @@ let ticketNumber = {
   name: 'ticket',
   message: 'What is the ticket number?',
   default: getDefaultTicket,
+  when: (answers) => answers.type !== 'none',
 }
 
 var ticketName = '';
