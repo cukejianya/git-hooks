@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { open } = require('node:fs/promises');
 const { exec } = require("child_process");
 const prependFile = require('prepend-file');
 const tty = require('tty');
@@ -42,8 +43,10 @@ function searchTypes(answers, input = '') {
     'none',
     'feat',
     'fix',
+    'chore',
     'refactor',
     'style',
+    'revert',
     'test',
     'build',
     'perf',
@@ -150,13 +153,18 @@ let questions = [
   ticketNumber,
 ];
 
-inquirer.prompt(questions).then( answers => {
+inquirer.prompt(questions).then( async(answers) => {
   if (answers.type === 'none') {
     process.exit(0);
   }
-  var scope = (answers.scope) ? `(${answers.scope})` : '';
-  var ticket = ticketName && answers.ticket ? `${ticketName}-${answers.ticket} - ` : '';
-  var prefix = `${answers.type + scope}: ${ticket}`;
+  const ticket = ticketName && answers.ticket ? "\n\n"+`${ticketName}-${answers.ticket}` : '';
+  const scope = (answers.scope) ? `(${answers.scope})` : '';
+  const prefix = `${answers.type + scope}: `
+
+  const file = await open(commit_msg_filepath, 'a');
+  await file.appendFile(ticket);
+  await file.close();
+
   prependFile(commit_msg_filepath, prefix, (err) => {
     if (err) {
       process.exit(1);
