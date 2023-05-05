@@ -157,7 +157,7 @@ inquirer.prompt(questions).then( async(answers) => {
   if (answers.type === 'none') {
     process.exit(0);
   }
-  const ticket = ticketName && answers.ticket ? "\n\n"+`${ticketName}-${answers.ticket}` : '';
+  const ticket = ticketName && answers.ticket ? "\n\n"+`Ticket: ${ticketName}-${answers.ticket}` : '';
   const scope = (answers.scope) ? `(${answers.scope})` : '';
   const prefix = `${answers.type + scope}: `
 
