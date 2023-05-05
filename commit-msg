@@ -35,6 +35,7 @@ let commitType = {
   type: 'autocomplete',
   name: 'type',
   message: 'What type of commit is this?',
+  pageSize: 12,
   source: (...args) => searchTypes(...args),
 }
 
