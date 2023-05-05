@@ -59,6 +59,13 @@ function searchTypes(answers, input = '') {
   });
 }
 
+let breakingChange = {
+  type: 'confirm',
+  name: 'breakingChange',
+  message: 'Is this a Breaking Change?',
+  default: false,
+}
+
 let commitScope = {
   type: 'autocomplete',
   name: 'scope',
@@ -149,6 +156,7 @@ function getBranchTicket(branch) {
 
 let questions = [
   commitType,
+  breakingChange,
   commitScope,
   ticketNumber,
 ];
@@ -158,8 +166,9 @@ inquirer.prompt(questions).then( async(answers) => {
     process.exit(0);
   }
   const ticket = ticketName && answers.ticket ? "\n\n"+`Ticket: ${ticketName}-${answers.ticket}` : '';
+  const breakingChange = answers.breakingChange ? '!' : '';
   const scope = (answers.scope) ? `(${answers.scope})` : '';
-  const prefix = `${answers.type + scope}: `
+  const prefix = `${answers.type + scope + breakingChange}: `
 
   const file = await open(commit_msg_filepath, 'a');
   await file.appendFile(ticket);
