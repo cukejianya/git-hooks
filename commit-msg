@@ -65,6 +65,7 @@ let breakingChange = {
   name: 'breakingChange',
   message: 'Is this a Breaking Change?',
   default: false,
+  when: (answers) => answers.type !== 'none',
 }
 
 let commitScope = {
