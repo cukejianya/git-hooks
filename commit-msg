@@ -46,7 +46,7 @@ function searchTypes(answers, input = '') {
     'fix',
     'chore',
     'refactor',
-    'style',
+    'format',
     'revert',
     'test',
     'build',
