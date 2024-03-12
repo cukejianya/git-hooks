@@ -87,7 +87,7 @@ async function searchScopes(answers, input = '') {
 }
 
 function getPreviousScopes() {
-  let cmd =`git log --pretty=format:%s -E --grep="^\\w+\\(.+\\)" --no-merges --all -1000`
+  let cmd =`git log --pretty=format:%s -E -P --grep="^\\w+\\(.+\\)" --no-merges --all -1000`
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
